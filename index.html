@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPTW_WC</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+}
+
+/* HEADER */
+header {
+    background: #ee4d2d;
+    color: white;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 🔥 KEY FIX */
+    
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header img {
+    height: 40px;
+}
+
+/* CONTAINER */
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 20px auto;
+}
+
+/* CARD */
+.card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* SECTION TITLE */
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ee4d2d;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* LINK ITEM */
+.link-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: #fafafa;
+    transition: 0.2s;
+}
+
+.link-item:hover {
+    background: #f0f0f0;
+	transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.link-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.link-title {
+    font-weight: bold;
+    color: #333;
+}
+
+.link-url {
+    font-size: 12px;
+    color: #777;
+}
+
+/* ACTIONS */
+.actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.copy-btn {
+    cursor: pointer;
+    color: #555;
+    font-weight: bold;
+}
+
+/* OPEN BUTTON */
+.open-btn {
+    text-decoration: none;
+    color: #ee4d2d;
+    font-weight: bold;
+}
+
+/* TOAST */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #28a745;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* DARK MODE */
+.dark body {
+    background: #121212;
+}
+
+.dark .card {
+    background: #1e1e1e;
+}
+
+.dark .link-item {
+    background: #2a2a2a;
+}
+
+.dark .link-item:hover {
+    background: #333;
+}
+
+.dark .link-title {
+    color: #eee;
+}
+
+.dark .link-url {
+    color: #aaa;
+}
+
+.dark header {
+    background: #ee4d2d;
+    color: white;
+}
+
+.dark .search-container {
+    background: #121212;
+}
+
+.dark mark {
+    background: #ffc107;
+    color: #000;
+}
+
+/* RIPPLE BASE */
+.link-item {
+    position: relative;
+    overflow: hidden;
+}
+
+/* RIPPLE ELEMENT */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    background: rgba(255, 255, 255, 0.6);
+    animation: ripple-effect 0.4s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-effect {
+    from {
+        transform: scale(0);
+        opacity: 0.6;
+    }
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* SHIMMER EFFECT */
+.link-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.link-item::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,1),
+        transparent
+    );
+}
+
+/* ANIMATION ONLY ON HOVER */
+.link-item:hover::after {
+    animation: shimmer 0.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 150%;
+    }
+}
+
+#searchBox {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    box-sizing: border-box; /* 🔥 THIS FIXES IT */
+}
+
+#searchResults {
+    position: relative;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(6px);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+    margin-top: 5px;
+
+    max-height: 150px;   /* 🔥 LIMIT HEIGHT (approx 5–6 items) */
+    overflow-y: auto;    /* 🔥 ENABLE SCROLL */
+}
+
+.result-item.active {
+    background: #ee4d2d;
+    color: white;
+}
+
+.section-content {
+    overflow: hidden;
+    max-height: 9999px; /* 🔥 always open by default */
+    transition: max-height 0.3s ease;
+}
+
+.section-content.collapsed {
+    max-height: 0;
+}
+
+.header-actions {
+    margin-left: auto; /* 🔥 pushes BOTH buttons to right */
+    display: flex;
+    gap: 8px; /* space between buttons */
+}
+
+.header-actions button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.header-actions button:hover {
+    opacity: 0.8;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.arrow {
+    transition: transform 0.3s ease;
+    font-size: 14px;
+}
+
+/* when expanded */
+.section-title.active .arrow {
+    transform: rotate(90deg); /* ▶ → ▼ */
+}
+
+.search-container {
+    position: sticky;
+    top: 90px; /* adjust based on header height */
+    z-index: 999;
+    background: #f5f5f5;
+    padding-bottom: 10px;
+}
+
+mark {
+    background: #ffeb3b;
+    color: #000;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.label {
+    font-weight: 400;
+    display: inline;
+    margin-right: 6px; /* small gap only */
+}
+
+.label.highlight {
+    font-weight: 700;
+}
+
+.value {
+    color: #333;
+}
+
+.pop-highlight {
+    animation: popEffect 0.6s ease;
+    outline: 2px solid #ee4d2d;
+}
+
+@keyframes popEffect {
+    0% {
+        transform: scale(1);
+        background: #fff3f0;
+    }
+    50% {
+        transform: scale(1.03);
+        background: #ffe0d9;
+    }
+    100% {
+        transform: scale(1);
+        background: inherit;
+    }
+}
+
+#searchResults::-webkit-scrollbar {
+    width: 6px;
+}
+
+#searchResults::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 6px;
+}
+
+#searchResults::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <div style="display:flex;align-items:center;gap:15px;">
+        <img src="logo.png">
+        <span>SPTW_Wrong Category Keywords</span>
+    </div>
+
+    <div class="header-actions">
+    </div>
+</header>
+<div class="container search-container">
+    <input 
+        type="text" 
+        id="searchBox" 
+        placeholder="Search field"
+        
+    >
+
+<div id="searchResults"></div>
+
+</div>
+
+<div class="container">
+
+<!-- CATEGORY KEYWORDS -->
+<div class="card">
+    <div class="section-title" onclick="toggleSection(this)" style="cursor:pointer;">
+    CATEGORY KEYWORDS  <span class="arrow">▶</span>
+</div>
+
+
+<div class="section-content">
+
+  
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Top-handle Bags</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Handbags, Tote Bags, Clutches; Pictures Show Bags With Handles Or Wristbands., Makeup Bag/Makeup Case, Lunch Bags/Insulated Bags, Shopping Bags</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100094</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Charms & Twillies</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Silk Scarves, Silk Bag Scarves, Silk Scarf Ties, Bag Charm</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100346</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Bag Organizers</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Bag Storage, Handbag Storage</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100347</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Bag Holders</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Handbag Hooks, Bag Hangers, Bag Hooks</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100345</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Others</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Various Zipper Heads, Zipper Pulls, Zipper Pull Strips</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100349</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Bag Straps</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shoulder Straps, Various Zipper Heads, Zipper Pulls, Zipper Pull Strips</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100344</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Cleaning & Care Equipment</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Leather Care, Leather Care Oil, Leather Bag Care, Fabric Cleaning</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100348</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Bifold & Trifold Wallets</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Short Wallet, Short Leather Wallet, Folding Wallet, Small Wallet, Bi-Fold Wallet, Tri-Fold Wallet</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100341</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Phone & Key Wallets</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Cell Phone Case, Key Pouch, Phone Bag</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100340</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Card Holders</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Business Card Holder, Id Card Holder, Document Holder, Card Wallet, Card Clip</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100338</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Others</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Wallet Chain, Wallet-Style Wallet</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100343</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Long Wallets</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Long Wallet, Long Leather Wallet</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100342</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Coin Holders & Purses</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Coin Purse, Wallet, Coin Case</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100339</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Tote Bags</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Tote Bag, Tote, Shopping Bag</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100093</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Others</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Makeup Bag/Makeup Case</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100098</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Backpacks</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Backpacks, Shoulder Bags, Hiking Backpacks</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100089</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Crossbody & Shoulder Bags</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Crossbody Bag</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100095</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Clutches & Wristlets</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Clutches, Handbags, Long Clutches, Evening Bags; The Pictures Look Suitable For Evening Events Or Are Small Enough To Be Carried Directly In The Hand.</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100091</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Waist Bags & Chest Bags</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Waist Bag, Chest Bag</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100092</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Laptop Bags - Laptop Bags & Cases</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Computer Bag, Laptop carry bag, Laptop Messenger Bag, Laptop Briefcase, Laptop crossbody bag</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100334</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Laptop Bags - Others</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Laptop Bag Strap</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100337</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Laptop Bags - Laptop Sleeves</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Laptop Sleeve, Laptop Bag</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100335</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Laptop Bags - Laptop Backpacks</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Laptop Backpack, Laptop Bag, Laptop Shoulder Bag</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100336</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Tube Tops</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Strapless, Strapless Strapless</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100351</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Others</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Non-Flat-Neck Wide-Strap Women'S Tank Top</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100356</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Tanks & Camisoles</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Thin-Strapped Tank Tops, Camisoles, Sleeveless Tank Tops, Sleeveless Tops, Vests, Waistcoats, Bratop For Thin Shoulders, Halter top</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100350</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Bodysuits</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Onesie, Bodysuit, Romper</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100355</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Shirts & Blouses</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shirts, Blouses, Or Similar Garments Including A Collar, Can Be Placed...</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100353</span></div>
+    </div><div class="actions"></div></div>
+
+<div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Polo Shirts</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Polo Shirt, Polo</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100354</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - T-shirts</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">T-Shirts, Non-Traditional T-Shirt Styles (With Sleeves But Not Vests, High/Low/V Necklines, Etc.), Sleeveless Vests (The Choice Can Be Relaxed If The User Actively Selects T-Shirts).</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100352</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Hoodies & Sweatshirts - Sweatshirts</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">College T-Shirts, Hoodies, College Kickshirts</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100373</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Hoodies & Sweatshirts - Others</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100375</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Hoodies & Sweatshirts - Hoodies</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Hoodies, Hooded Tops</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100374</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bras</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Underwear, Seamless Underwear, Wire-Free, Bras, Lace Underwear, Brera, Bralette, French Lingerie, Nubra, Breast Petals, Invisible Underwear, Invisible Bras, Pure Nubra, Chest Binder</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100381</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bra Accessories - Straps</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Bra Straps, Bra Bands</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100523</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bra Accessories - Others</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100526</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bra Accessories - Nipple Stickers</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Breast Stickers, Nipple Covers, Invisible Stickers, Pure Nubra</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100525</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bra Accessories - Paddings</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Breast Pads, Sponge, Silicone Pads, Pure Nubra</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100524</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Panties</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Underwear, Seamless Underwear, Briefs, Boxer Briefs, Thongs, Menstrual Panties, Period Underwear, Leak-Proof Underwear, Butt-Lifting Panties, Supportive Panties, Disposable Underwear, Maternity Underwear</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100382</span></div>
+    </div><div class="actions"></div></div>
+
+    <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Safety Pants</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Safety Shorts, To Prevent Exposure</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100386</span></div>
+    </div><div class="actions"></div></div>
+
+</div>
+</div>
+
+<!-- PRODUCT CATEGORY COMPILATION -->
+<div class="card">
+    <div class="section-title" onclick="toggleSection(this)" style="cursor:pointer;">
+    PRODUCT CATEGORY COMPILATION  <span class="arrow">▶</span>
+</div>
+
+
+<div class="section-content">
+   <div class="link-item"><div class="link-left">
+        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Shirts & Blouses</span></div>
+        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shirts, Blouses, Or Similar Garments Including A Collar, Can Be Placed...</span></div>
+        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
+        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100353</span></div>
+    </div><div class="actions"></div></div>
+
+</div>
+</div>
+
+
+
+
+<script>
+function copyLink(url){
+navigator.clipboard.writeText(url);
+const t=document.getElementById("toast");
+t.style.display="block";
+setTimeout(()=>t.style.display="none",2000);
+}
+
+function toggleMode(){
+document.documentElement.classList.toggle("dark");
+}
+
+
+</script>
+
+<script>
+document.querySelectorAll(".link-item").forEach(item => {
+    item.addEventListener("click", function(e) {
+
+        // 🚫 Ignore clicks on Copy / Open
+        if (e.target.closest(".actions")) return;
+
+        const ripple = document.createElement("span");
+        ripple.classList.add("ripple");
+
+        const rect = this.getBoundingClientRect();
+
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + "px";
+
+        ripple.style.left = (e.clientX - rect.left - size / 2) + "px";
+        ripple.style.top = (e.clientY - rect.top - size / 2) + "px";
+
+        this.appendChild(ripple);
+
+        setTimeout(() => ripple.remove(), 600);
+    });
+});
+</script>
+
+
+<script>
+const searchBox = document.getElementById("searchBox");
+const resultsBox = document.getElementById("searchResults");
+
+resultsBox.addEventListener("click", function(e) {
+    const item = e.target.closest(".result-item");
+    if (!item) return;
+
+    const id = item.dataset.id;
+
+    scrollToElementById(id);
+});
+
+let currentIndex = -1;
+let currentResults = [];
+
+
+// 🔥 render dropdown
+function renderResults(filtered) {
+    currentResults = filtered;
+
+    if (filtered.length === 0) {
+        resultsBox.style.display = "block";
+        resultsBox.innerHTML = `<div style="padding:10px;">No results found</div>`;
+        return;
+    }
+
+    resultsBox.innerHTML = filtered.map((link, index) => `
+    <div class="result-item" 
+         data-id="${link.leafId}"
+         data-index="${index}"
+         style="padding:10px;cursor:pointer;border-bottom:1px solid #eee;">
+
+        <div style="font-weight:600;">
+            ID: ${link.leafId}
+        </div>
+
+        <div style="font-size:12px;color:#555;">
+            ${link.category}
+        </div>
+
+    </div>
+`).join("");
+
+    currentIndex = 0;
+
+    const items = document.querySelectorAll(".result-item");
+    items[0]?.classList.add("active");
+
+    resultsBox.style.display = "block";
+}
+
+function scrollToElementById(id) {
+    const items = document.querySelectorAll(".link-item");
+
+    let target = null;
+
+    items.forEach(item => {
+        const values = item.querySelectorAll(".value");
+        const leafId = values[3]?.innerText;
+
+        if (leafId === id) {
+            target = item;
+        }
+    });
+
+    if (!target) return;
+
+    // 🔥 STEP 1: open section
+    const section = target.closest(".section-content");
+    const title = section.previousElementSibling;
+
+    section.style.maxHeight = section.scrollHeight + "px";
+    title.classList.add("active");
+
+    // 🔥 STEP 2: wait for layout (CRITICAL FIX)
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+
+            // 🔥 STEP 3: perfect center scroll
+            const rect = target.getBoundingClientRect();
+            const absoluteTop = rect.top + window.pageYOffset;
+            const offset = window.innerHeight / 2 - rect.height / 2;
+
+            window.scrollTo({
+                top: absoluteTop - offset,
+                behavior: "smooth"
+            });
+
+            // 🔥 STEP 4: animation AFTER scroll
+            setTimeout(() => {
+                let count = 0;
+
+                function popRepeat() {
+                    if (count >= 3) return;
+
+                    target.classList.remove("pop-highlight");
+                    void target.offsetWidth;
+                    target.classList.add("pop-highlight");
+
+                    count++;
+                    setTimeout(popRepeat, 600);
+                }
+
+                popRepeat();
+
+            }, 500); // adjust if needed
+
+        });
+    });
+
+    // cleanup
+    resultsBox.style.display = "none";
+    searchBox.blur();
+}
+
+
+// 🔥 input handler
+
+function getAllLinks() {
+    const items = document.querySelectorAll(".link-item");
+
+    return Array.from(items).map(item => {
+        const values = item.querySelectorAll(".value");
+
+        return {
+            element: item,
+            category: values[0]?.innerText || "",
+            keywords: values[1]?.innerText || "",
+            leafId: values[3]?.innerText || "",
+            fullText: item.textContent.toLowerCase()
+        };
+    });
+}
+
+searchBox.addEventListener("input", function() {
+    const query = this.value.toLowerCase().trim();
+
+    if (query.length < 3) {
+        resultsBox.style.display = "none";
+        resultsBox.innerHTML = "";
+        resetMainList();
+
+
+        document.querySelectorAll(".section-title").forEach(title => {
+            title.classList.remove("active");
+        });
+
+        return;
+    }
+
+    const allLinks = getAllLinks();
+
+    const filtered = allLinks.filter(link =>
+        link.fullText.includes(query)
+    );
+
+    // 🔥 DEBUG (optional, remove later)
+    console.log("Filtered:", filtered);
+
+    highlightMainList(query);
+    renderResults(filtered);
+});
+
+// 🔥 keyboard navigation
+searchBox.addEventListener("keydown", function(e) {
+    const items = document.querySelectorAll(".result-item");
+
+    if (!items.length) return;
+
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        currentIndex = (currentIndex + 1) % items.length;
+    }
+
+    if (e.key === "ArrowUp") {
+        e.preventDefault();
+        currentIndex = (currentIndex - 1 + items.length) % items.length;
+    }
+
+if (e.key === "Enter") {
+    e.preventDefault();
+
+    const query = searchBox.value.toLowerCase().trim();
+
+    if (query.length < 3) return;
+
+    const allLinks = getAllLinks();
+    const filtered = allLinks.filter(link =>
+        link.fullText.includes(query)
+    );
+
+    if (filtered.length === 0) return;
+
+    // 🔥 ALWAYS sync state here
+    currentResults = filtered;
+
+    // 🔥 If dropdown hidden → show it
+    if (resultsBox.style.display === "none") {
+        renderResults(filtered);
+        return;
+    }
+
+    // 🔥 Guarantee valid index
+    if (currentIndex < 0 || currentIndex >= filtered.length) {
+        currentIndex = 0;
+    }
+
+    // 🔥 Execute
+    scrollToItem(currentIndex);
+}
+
+    if (e.key === "Escape") {
+        resultsBox.style.display = "none";
+        return;
+    }
+
+    // 🔥 highlight active
+    items.forEach(item => item.classList.remove("active"));
+    if (items[currentIndex]) {
+        items[currentIndex].classList.add("active");
+    }
+});
+
+// 🔥 click outside
+document.addEventListener("click", function(e) {
+    if (!e.target.closest("#searchBox") && !e.target.closest("#searchResults")) {
+        resultsBox.style.display = "none";
+    }
+});
+</script>
+
+<script>
+function openLink(title, url) {
+    saveRecent(title, url);
+    window.open(url, "_blank");
+}
+
+function saveRecent(title, url) {
+    let recents = JSON.parse(localStorage.getItem("recentLinks")) || [];
+
+    // remove duplicate
+    recents = recents.filter(item => item.url !== url);
+
+    // add to top
+    recents.unshift({ title, url });
+
+    // limit to 5 items
+    recents = recents.slice(0, 5);
+
+    localStorage.setItem("recentLinks", JSON.stringify(recents));
+}
+</script>
+
+<script>
+
+searchBox.addEventListener("focus", function() {
+    const query = this.value.toLowerCase().trim();
+
+    if (query.length < 3) return;
+
+    const allLinks = getAllLinks();
+
+    const filtered = allLinks.filter(link =>
+        link.fullText.includes(query)
+    );
+
+    renderResults(filtered); // 🔥 show dropdown again
+});</script>
+
+<script>
+function clearRecent() {
+    const toast = document.getElementById("toast");
+
+    if (confirm("Clear recent searches?")) {
+        localStorage.removeItem("recentLinks");
+
+        // update dropdown
+        const resultsBox = document.getElementById("searchResults");
+        resultsBox.innerHTML = `<div style="padding:10px;">No recent items</div>`;
+
+        // ✅ success message
+        toast.innerText = "Recent searches cleared!";
+        toast.style.background = "#28a745"; // green
+    } else {
+        // ❌ cancel message
+        toast.innerText = "No changes made.";
+        toast.style.background = "#ffca2c"; // yellow
+        toast.style.color = "#000"; // 🔥 important for readability
+    }
+
+    // show toast
+    toast.style.display = "block";
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 700);
+}
+</script>
+
+<script>
+function toggleSection(el) {
+    const content = el.nextElementSibling;
+
+    if (content.style.maxHeight && content.style.maxHeight !== "0px") {
+        content.style.maxHeight = "0";
+        el.classList.remove("active"); // 🔥 rotate back
+    } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        el.classList.add("active"); // 🔥 rotate arrow
+    }
+}
+</script>
+
+<script>
+let allExpanded = false;
+
+function toggleAllSections() {
+    const sections = document.querySelectorAll(".section-content");
+    const titles = document.querySelectorAll(".section-title");
+
+    sections.forEach(section => {
+        if (!allExpanded) {
+            section.style.maxHeight = section.scrollHeight + "px";
+        } else {
+            section.style.maxHeight = "0";
+        }
+    });
+
+    titles.forEach(title => {
+        if (!allExpanded) {
+            title.classList.add("active");   // rotate arrow
+        } else {
+            title.classList.remove("active"); // reset arrow
+        }
+    });
+
+    allExpanded = !allExpanded;
+
+    // toggle button icon
+    const btn = document.querySelector('[onclick="toggleAllSections()"]');
+    btn.textContent = allExpanded ? "⬆️" : "⬇️";
+}
+</script>
+
+<script>
+function updateSectionsBySearch(filtered) {
+    const allSections = document.querySelectorAll(".section-content");
+
+    allSections.forEach(section => {
+        const items = section.querySelectorAll(".link-item");
+        let hasMatch = false;
+
+        items.forEach(item => {
+            
+
+            if (filtered.some(f => f.title.toLowerCase() === title)) {
+                hasMatch = true;
+            }
+        });
+
+        const titleEl = section.previousElementSibling;
+
+        if (hasMatch) {
+            section.style.maxHeight = section.scrollHeight + "px";
+            titleEl.classList.add("active"); // rotate arrow
+        } else {
+            section.style.maxHeight = "0";
+            titleEl.classList.remove("active");
+        }
+    });
+}
+</script>
+
+<script>
+function highlightMainList(query) {
+    document.querySelectorAll(".link-item").forEach(item => {
+
+        const rows = item.querySelectorAll(".value");
+
+        rows.forEach(el => {
+            const original = el.dataset.original || el.innerText;
+
+            if (!el.dataset.original) {
+                el.dataset.original = original;
+            }
+
+            const regex = new RegExp(`(${query})`, "gi");
+            el.innerHTML = original.replace(regex, `<mark>$1</mark>`);
+        });
+
+    });
+}
+
+function resetMainList() {
+    document.querySelectorAll(".value").forEach(el => {
+        if (el.dataset.original) {
+            el.innerText = el.dataset.original;
+        }
+    });
+}
+
+</script>
+
+
+
+</body>
+
+</html>
+
