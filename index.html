@@ -3,1912 +3,437 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shopee Taiwan</title>
+<title>SPTxWC</title>
+<link rel="icon" type="image/png" href="logo1.png">
+
+<!-- XLSX LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
+
 body {
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    background: #f5f5f5;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
 }
 
-/* HEADER */
-header {
-    background: #ee4d2d;
-    color: white;
-    padding: 20px;
-    font-size: 24px;
-    font-weight: bold;
+.data-card b {
+    font-weight: 600;  /* clean emphasis */
+}
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* 🔥 KEY FIX */
-    
-    position: sticky;
+/* LOGO FIXED */
+.logo-container {
+    position: fixed;
+    top: 20px;                         /* 🔥 anchor to very top */
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 100%;
+    max-width: 600px;
+
+    background: #ffffff;
+    border: 3px solid #f97316;
+    padding: 20px;
+    border-radius: 8px;
+
+    z-index: 9999;                  /* 🔥 ensure it's above EVERYTHING */
+}
+
+.logo-container img {
+    height: 85px;
+    display: block;
+    margin: 0 auto;
+    background: none;   /* 🔥 ensure no box */
+    padding: 0;
+}
+
+body::before {
+    content: "";
+    position: fixed;
     top: 0;
-    z-index: 1000;
+    left: 0;
+    width: 100%;
+    height: 160px;                  /* 🔥 match header height */
+    background: #ffffff;
+    z-index: 998;                   /* just below header */
 }
 
-header img {
-    height: 40px;
-}
-
-/* CONTAINER */
+/* CONTENT */
 .container {
-    width: 90%;
-    max-width: 1100px;
-    margin: 20px auto;
+    margin-top: 20px;
+    padding-top: 220px;   /* only push down from header */
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 200px;
+
+    max-width: 1000px;     /* 🔥 FIXED WIDTH */
+    margin-left: auto;
+    margin-right: auto;   /* center it */
+    margin: 0 auto;
 }
 
-/* CARD */
-.card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-/* SECTION TITLE */
-.section-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #ee4d2d;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-}
-
-/* LINK ITEM */
-.link-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* ROW CARD */
+.data-card {
+    background: #f9f9f9;
     padding: 12px;
     border-radius: 6px;
     margin-bottom: 10px;
-    background: #fafafa;
-    transition: 0.2s;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.link-item:hover {
-    background: #f0f0f0;
-	transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+/* FIELD */
+.field {
+    margin-bottom: 5px;
 }
 
-.link-left {
-    display: flex;
-    flex-direction: column;
-}
-
-.link-title {
-    font-weight: bold;
-    color: #333;
-}
-
-.link-url {
-    font-size: 12px;
-    color: #777;
-}
-
-/* ACTIONS */
-.actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.copy-btn {
-    cursor: pointer;
-    color: #555;
-    font-weight: bold;
-}
-
-/* OPEN BUTTON */
-.open-btn {
-    text-decoration: none;
-    color: #ee4d2d;
-    font-weight: bold;
-}
-
-/* TOAST */
+/* POPUP */
 .toast {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: #28a745;
-    color: white;
     padding: 12px 18px;
     border-radius: 6px;
-    font-size: 14px;
-    display: none;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
-
-/* DARK MODE */
-.dark body {
-    background: #121212;
-}
-
-.dark .card {
-    background: #1e1e1e;
-}
-
-.dark .link-item {
-    background: #2a2a2a;
-}
-
-.dark .link-item:hover {
-    background: #333;
-}
-
-.dark .link-title {
-    color: #eee;
-}
-
-.dark .link-url {
-    color: #aaa;
-}
-
-.dark header {
-    background: #ee4d2d;
     color: white;
+    display: none;
 }
 
-.dark .search-container {
-    background: #121212;
+.toast.success {
+    background: #28a745;
 }
 
-.dark mark {
-    background: #ffc107;
-    color: #000;
+.toast.error {
+    background: #dc3545;
 }
 
-/* RIPPLE BASE */
-.link-item {
-    position: relative;
-    overflow: hidden;
-}
-
-/* RIPPLE ELEMENT */
-.ripple {
-    position: absolute;
-    border-radius: 50%;
-    transform: scale(0);
-    background: rgba(255, 255, 255, 0.6);
-    animation: ripple-effect 0.4s linear;
-    pointer-events: none;
-}
-
-@keyframes ripple-effect {
-    from {
-        transform: scale(0);
-        opacity: 0.6;
-    }
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-
-/* SHIMMER EFFECT */
-.link-item {
-    position: relative;
-    overflow: hidden;
-}
-
-.link-item::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255,255,255,1),
-        transparent
-    );
-}
-
-/* ANIMATION ONLY ON HOVER */
-.link-item:hover::after {
-    animation: shimmer 0.5s infinite;
-}
-
-@keyframes shimmer {
-    0% {
-        left: -100%;
-    }
-    100% {
-        left: 150%;
-    }
+/* SEARCH AREA */
+.search-wrapper {
+    margin-top: 20px;  /* 🔥 exact spacing you want */
+    width: 100%;
 }
 
 #searchBox {
     width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    box-sizing: border-box; /* 🔥 THIS FIXES IT */
-}
-
-#searchResults {
-    position: relative;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(6px);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    display: none;
-    margin-top: 5px;
-
-    max-height: 400px;   /* 🔥 LIMIT HEIGHT (approx 5–6 items) */
-    overflow-y: auto;    /* 🔥 ENABLE SCROLL */
-}
-
-.result-item.active {
-    background: #ee4d2d;
-    color: white;
-}
-
-.section-content {
-    overflow: hidden;
-    max-height: 9999px; /* 🔥 always open by default */
-    transition: max-height 0.3s ease;
-}
-
-.section-content.collapsed {
-    max-height: 0;
-}
-
-.header-actions {
-    margin-left: auto; /* 🔥 pushes BOTH buttons to right */
-    display: flex;
-    gap: 8px; /* space between buttons */
-}
-
-.header-actions button {
-    padding: 8px 12px;
-    border: none;
+    padding: 10px;
     border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;  /* 🔥 IMPORTANT */
+}
+
+/* DROPDOWN */
+#searchResults {
+    position: absolute;   /* 🔥 key fix */
+    top: 100%;
+    left: 0;
+    width: 100%;
+
+    background: white;
+    border: 1px solid #ddd;
+    max-height: 250px;
+    overflow-y: auto;
+
+    z-index: 2000;        /* above everything */
+}
+
+/* RESULT ITEM */
+.result-item {
+    padding: 8px;
     cursor: pointer;
+    border-bottom: 1px solid #eee;
 }
 
-.header-actions button:hover {
-    opacity: 0.8;
-}
-
-.section-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.arrow {
-    transition: transform 0.3s ease;
-    font-size: 14px;
-}
-
-/* when expanded */
-.section-title.active .arrow {
-    transform: rotate(90deg); /* ▶ → ▼ */
-}
-
-.search-container {
-    position: sticky;
-    top: 90px; /* adjust based on header height */
-    z-index: 999;
+.result-item:hover {
     background: #f5f5f5;
-    padding-bottom: 10px;
+}
+
+.result-id {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.result-category {
+    font-size: 12px;
+    color: #555;
+}
+
+.search-wrapper {
+    position: relative;   /* 🔥 anchor for dropdown */
+    width: 100%;
+    max-width: 600px;
+}
+
+.data-card {
+    transition: all 0.3s ease;
 }
 
 mark {
-    background: #ffeb3b;
-    color: #000;
+    background: yellow;
     padding: 0 2px;
-    border-radius: 2px;
 }
 
-.label {
-    font-weight: 400;
-    display: inline;
-    margin-right: 6px; /* small gap only */
+@keyframes pulseHighlight {
+    0%   { transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
+    50%  { transform: scale(1.03); box-shadow: 0 0 10px rgba(0,0,0,0.4); }
+    100% { transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
 }
 
-.label.highlight {
-    font-weight: 700;
+.active-highlight {
+    animation: pulseHighlight 0.6s ease;
+    border: 2px solid #333;   /* or #000 or #666 */
 }
 
-.value {
-    color: #333;
-}
+#output {
+    display: grid;
 
-.pop-highlight {
-    animation: popEffect 0.6s ease;
-    outline: 2px solid #ee4d2d;
-}
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 16px;
 
-@keyframes popEffect {
-    0% {
-        transform: scale(1);
-        background: #fff3f0;
-    }
-    50% {
-        transform: scale(1.03);
-        background: #ffe0d9;
-    }
-    100% {
-        transform: scale(1);
-        background: inherit;
-    }
-}
-
-#searchResults::-webkit-scrollbar {
-    width: 6px;
-}
-
-#searchResults::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 6px;
-}
-
-#searchResults::-webkit-scrollbar-thumb:hover {
-    background: #999;
+    max-width: 900px;   /* 🔥 controls overall width */
+    margin: 0 auto;     /* 🔥 centers everything */
 }
 
 </style>
-
 </head>
 
 <body>
 
-<header>
-    <div style="display:flex;align-items:center;gap:15px;">
-        <img src="logo_spt.png">
-        <span>SupportZebra X Shopee Taiwan | Wrong Category Keywords</span>
+<!-- CLICKABLE LOGO -->
+<div class="logo-container">
+    <img src="logo2.png"
+     style="cursor:pointer;"
+     onclick="document.getElementById('fileInput').click()">
+
+    <div class="search-wrapper">
+        <input type="text" id="searchBox" placeholder="Search...">
+        <div id="searchResults"></div>
     </div>
-
-    <div class="header-actions">
-    </div>
-</header>
-<div class="container search-container">
-    <input 
-        type="text" 
-        id="searchBox" 
-        placeholder="Search field"
-        
-    >
-
-<div id="searchResults"></div>
-
 </div>
 
-<div class="container">
+<!-- HIDDEN FILE INPUT -->
+<input type="file" id="fileInput" accept=".xlsx" style="display:none">
 
-<!-- CATEGORY KEYWORDS -->
-<div class="card">
-    <div class="section-title" onclick="toggleSection(this)" style="cursor:pointer;">
-    CATEGORY KEYWORDS  <span class="arrow">▶</span>
-</div>
+<!-- DATA OUTPUT -->
+<div class="container" id="output"></div>
 
-
-<div class="section-content">
-
-  
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Top-handle Bags</span></div>
-        <div class="link-row"><span class="label">English kw:</span><span class="value">Handbags, Tote Bags, Clutches; Pictures Show Bags With Handles Or Wristbands., Makeup Bag/Makeup Case, Lunch Bags/Insulated Bags, Shopping Bags</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value">Stationery bags that heavily emphasize tutoring and stationery supplies, used by students can be broadened to include stationery, art supplies - school supplies, office supplies - other do not need to be forcibly banned from BE - Women Bags - Top-handle Bags users will feel they are not boutique bags!</span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100094</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Charms & Twillies</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Silk Scarves, Silk Bag Scarves, Silk Scarf Ties, Bag Charm</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100346</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Bag Organizers</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Bag Storage, Handbag Storage</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100347</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Bag Holders</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Handbag Hooks, Bag Hangers, Bag Hooks</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100345</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Various Zipper Heads, Zipper Pulls, Zipper Pull Strips</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100349</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Bag Straps</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shoulder Straps, Various Zipper Heads, Zipper Pulls, Zipper Pull Strips</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100344</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Bag Accessories - Cleaning & Care Equipment</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Leather Care, Leather Care Oil, Leather Bag Care, Fabric Cleaning</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100348</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Bifold & Trifold Wallets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Short Wallet, Short Leather Wallet, Folding Wallet, Small Wallet, Bi-Fold Wallet, Tri-Fold Wallet</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100341</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Phone & Key Wallets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Cell Phone Case, Key Pouch, Phone Bag</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100340</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Card Holders</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Business Card Holder, Id Card Holder, Document Holder, Card Wallet, Card Clip</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100338</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Wallet Chain, Wallet-Style Wallet</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100343</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Long Wallets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Long Wallet, Long Leather Wallet</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100342</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Wallets - Coin Holders & Purses</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Coin Purse, Wallet, Coin Case</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100339</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Tote Bags</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Tote Bag, Tote, Shopping Bag</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100093</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Makeup Bag/Makeup Case</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100098</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Backpacks</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Backpacks, Shoulder Bags, Hiking Backpacks</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100089</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Crossbody & Shoulder Bags</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Crossbody Bag</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100095</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Clutches & Wristlets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Clutches, Handbags, Long Clutches, Evening Bags; The Pictures Look Suitable For Evening Events Or Are Small Enough To Be Carried Directly In The Hand.</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100091</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Waist Bags & Chest Bags</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Waist Bag, Chest Bag</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100092</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Laptop Bags - Laptop Bags & Cases</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Computer Bag, Laptop carry bag, Laptop Messenger Bag, Laptop Briefcase, Laptop crossbody bag</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100334</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Laptop Bags - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Laptop Bag Strap</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100337</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Laptop Bags - Laptop Sleeves</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Laptop Sleeve, Laptop Bag</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100335</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Bags - Laptop Bags - Laptop Backpacks</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Laptop Backpack, Laptop Bag, Laptop Shoulder Bag</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100336</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Tube Tops</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Strapless, Strapless Strapless</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100351</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Non-Flat-Neck Wide-Strap Women'S Tank Top</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100356</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Tanks & Camisoles</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Thin-Strapped Tank Tops, Camisoles, Sleeveless Tank Tops, Sleeveless Tops, Vests, Waistcoats, Bratop For Thin Shoulders, Halter top</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100350</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Bodysuits</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Onesie, Bodysuit, Romper</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100355</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Shirts & Blouses</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shirts, Blouses, Or Similar Garments Including A Collar, Can Be Placed...</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100353</span></div>
-    </div><div class="actions"></div></div>
-
-<div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - Polo Shirts</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Polo Shirt, Polo</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100354</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Tops - T-shirts</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">T-Shirts, Non-Traditional T-Shirt Styles (With Sleeves But Not Vests, High/Low/V Necklines, Etc.), Sleeveless Vests (The Choice Can Be Relaxed If The User Actively Selects T-Shirts).</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100352</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Hoodies & Sweatshirts - Sweatshirts</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">College T-Shirts, Hoodies, College Kickshirts</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100373</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Hoodies & Sweatshirts - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100375</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Hoodies & Sweatshirts - Hoodies</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Hoodies, Hooded Tops</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100374</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bras</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Underwear, Seamless Underwear, Wire-Free, Bras, Lace Underwear, Brera, Bralette, French Lingerie, Nubra, Breast Petals, Invisible Underwear, Invisible Bras, Pure Nubra, Chest Binder</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100381</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bra Accessories - Straps</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Bra Straps, Bra Bands</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100523</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bra Accessories - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100526</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bra Accessories - Nipple Stickers</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Breast Stickers, Nipple Covers, Invisible Stickers, Pure Nubra</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100525</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Bra Accessories - Paddings</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Breast Pads, Sponge, Silicone Pads, Pure Nubra</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100524</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Panties</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Underwear, Seamless Underwear, Briefs, Boxer Briefs, Thongs, Menstrual Panties, Period Underwear, Leak-Proof Underwear, Butt-Lifting Panties, Supportive Panties, Disposable Underwear, Maternity Underwear</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100382</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Safety Pants</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Safety Shorts, To Prevent Exposure</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100386</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Sets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Complete Sets Of Underwear, Underwear Sets, Panty Sets</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100380</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Sexy Lingerie</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Lingerie, Sexy Underwear, Stockings, Stocking Clips, Non-Slip Stocking Clips</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100387</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Thermal Innerwear</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Thermal Clothing, Innerwear, Thermal Underwear, Women'S Belly Band, Belly Band, Layering top</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100383</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Shapewear</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shapewear, Tights, Tummy Control Garments, Base Layer Slimming Garments, Waist Trainers, Postpartum Slimming Garments, Tummy Control Shaping Garments, Postpartum Waist Trainers, Postpartum Shapewear</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100385</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Lingerie & Underwear - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Chest Binder, Bratop For Thin Shoulders, Sports Bra</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100388</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sweaters & Cardigans</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sweater, Cardigan, Adult Sweater Cardigan/Knitted Cardigan</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100108</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jeans</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Jeans, Denim Shorts</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100103</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jackets, Coats & Vests - Capes</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Cloak</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100368</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jackets, Coats & Vests - Winter Jackets & Coats</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Winter Coats, Winter Overcoats, Adult Sweater Cardigan/Knitted Cardigan</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100367</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jackets, Coats & Vests - Blazers</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Suit Jacket, Suit</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100369</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jackets, Coats & Vests - Jackets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Skin Jacket, Windbreaker, Fishing Clothes, Sun Protection Clothing, Windproof Jacket, Jacket, Baseball Jacket, Flight Jacket, Motorcycle Jacket, Leather Jacket, Adult Sweater Cardigan/Knitted Cardigan</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span>The term "outerwear" is difficult to define; users selecting "other outerwear" for women do not need to exclude "jacket".</div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100370</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jackets, Coats & Vests - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Adult Sweater Cardigan/Knitted Cardigan</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100372</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jackets, Coats & Vests - Vests</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Vest Jacket, Down Vest</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100371</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Maternity Wear - Maternity Tops</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Maternity Clothes, Maternity Tops, Maternity Shirts</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100395</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Maternity Wear - Maternity Bottoms</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Maternity Pants, Maternity Underwear, Maternity Leggings</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100398</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Maternity Wear - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Maternity Underwear, Maternity Coat, Nursing Coat</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100399</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Maternity Wear - Maternity Dresses</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Maternity Dresses, Maternity Skirts</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100394</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Maternity Wear - Nursing Bras</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Nursing Bras, Nursing Underwear, Maternity Bras</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100393</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Maternity Wear - Breastfeeding Wear</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Nursing Clothes, Nursing Tops</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100396</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Maternity Wear - Maternity Sets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Maternity Set</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100397</span></div>
-    </div><div class="actions"></div></div>
-
-<div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Fabric - Velvet, Silk & Satin</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Velvet, Silk, Real Silk, Satin</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100409</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Fabric - Denim</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Denim, Jeans</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100412</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Fabric - Vinyl & Nylon</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Nylon</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100411</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Fabric - Leather</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Leather</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100410</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Fabric - Canvas</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Canvas</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100413</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Fabric - Wool</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Wool, Felt Materials, Wool Felt, Animal-Colored Wool</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100408</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Fabric - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Fabrics Without A Specific Material Mentioned, And Images Thereof, Can Be Identified As Fabrics.</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100416</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Fabric - Cotton</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Cotton</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100407</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Costumes</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Role-Playing, Cosplay, Halloween Costumes, Halloween Role-Playing, Anime Role-Playing, Superhero Cosplay, Princess Dresses, Anime/Cartoon/Game Ip Adult Cosplay Costumes</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100115</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Buddhist Robes, Monk'S Attire, Lay Buddhist Robes, Women'S Work Clothes</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100116</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Pants & Leggings - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100359</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Pants & Leggings - Pants</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Pants, Trousers, Casual Trousers, Suit Trousers, Flared Trousers, Capri Trousers, 7/8/9/10 ...</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100358</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Pants & Leggings - Leggings & Treggings</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Skinny Jeans, Leggings, And Faux Two-Piece Leggings</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100357</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Dresses</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Dresses, Gowns, Shirt Dresses</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100104</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sets - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Women'S Set</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100379</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sets - Individual Sets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Suits, Two-Piece Suits, Casual Suits, Hooded Suits, Women'S Set</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100378</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sets - Couple Sets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Couple Outfits, Matching Men'S And Women'S Outfits, Couple T-Shirts, Couple Sets</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100376</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sets - Family Sets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Mother-Daughter Outfits, Family Outfits, Family Clothes, Family Uniforms</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100377</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jumpsuits, Playsuits & Overalls - Overalls</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Overalls, Overalls Trousers, Overalls Shorts, Overalls Dress</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100365</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jumpsuits, Playsuits & Overalls - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100366</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jumpsuits, Playsuits & Overalls - Jumpsuits</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Jumpsuit, Romper</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100363</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Jumpsuits, Playsuits & Overalls - Playsuits</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Jumpsuits, Rompers</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100364</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Shorts - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100362</span></div>
-    </div><div class="actions"></div></div>
-
-<div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Shorts - Shorts</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shorts, Denim Shorts</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100360</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Shorts - Skorts</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Skirts And Culottes (All Types Of Skirts And Culottes Are Listed Here)</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100361</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Traditional Wear - Tops</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Kebaya Top, Tang Suit</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100400</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Traditional Wear - Bottoms</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sarong</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100401</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Traditional Wear - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Dupatta</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100404</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Traditional Wear - Dresses</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Cheongsam, Dae Jang Geum, Traditional Costumes, Yi Ethnic Group, Kimono</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100403</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Traditional Wear - Sets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Hanfu, Kimono, Republic Of China Era Student Uniforms, Ethnic Costumes, Traditional Clothing</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100402</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sleepwear & Pajamas - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100392</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sleepwear & Pajamas - Pajamas</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Loungewear, Loungewear Sets, Home Wear, Pajamas</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100389</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sleepwear & Pajamas - Night Dresses</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Nightgown, One-Piece Nightgown</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100390</span></div>
-    </div><div class="actions"></div></div>
-
-<div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Sleepwear & Pajamas - Kimonos & Robes</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Bathrobes, Pajamas</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100391</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Skirts</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Skirts, Midi Skirts, Mini Skirts, Flared Skirts, Maxi Skirts, Denim Skirts</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100102</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Wedding Dresses</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Wedding Dresses, Bridal Gowns, Wedding Suits, Bridesmaid Dresses, Traditional Chinese Wedding Dresses (Dragon And Phoenix Robes), Evening Gowns, Party Dresses</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100105</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Socks & Stockings - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sock Clips, Anti-Slip Sock Clips, Leg Warmers, Compression Stockings, Silicone Foot Warmers</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100419</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Socks & Stockings - Pantyhose</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Stockings, Thigh-High Stockings, Pantyhose, Sheer Tights, Regular-Length Fishnet Stockings</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100418</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Clothes - Socks & Stockings - Socks</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Socks, Athletic Socks, Long Socks, Cotton Socks, Short Socks, Ankle Socks, Invisible Socks, Non-Fishnet Socks, Thigh-High Stockings, Crystal Ankle Socks, Fishnet Ankle Socks, Silicone Foot Warmers</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100417</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flats - Oxfords & Lace-Ups</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Oxford Shoes, Lace-Up Shoes, Leather Shoes</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100590</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flats - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Flat Embroidered Shoes, Flat Cheongsam Shoes</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100592</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flats - Ballet Flats</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Ballet Flats, Ballet Ballet Shoes, Ballet Round-Toe Shoes, Ballet Women'S Shoes</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100588</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flats - Loafers & Boat Shoes</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Loafers, Boat Shoes, Moccasins</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100589</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flats - Slip Ons, Mary Janes & Mules</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Bandage Shoes, Slip-On Shoes, Mules, Mary Janes, Mary Jane Shoes, Espadrilles, Fisherman Shoes</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100591</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Sneakers</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sneakers, Athletic Shoes, Casual Shoes, Canvas Shoes, Athletic Casual Shoes</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100557</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Women'S Adult Roller Skates</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100563</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flat Sandals & Flip Flops - Flip Flops</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Flip-Flops, Adult Slippers/Men'S And Women'S Flip-Flops, Outdoor Sandals</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100594</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flat Sandals & Flip Flops - Flat Sandals</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Flat Shoes, Sandals, Flat Sandals, Roman Sandals, Beach Sandals, Outdoor Sandals, Hiking Sandals</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100593</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flat Sandals & Flip Flops - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Platform Sandals, Adult Slippers/Men'S And Women'S Flip-Flops, Outdoor Sandals</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100597</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flat Sandals & Flip Flops - Indoor Slippers</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Indoor Slippers, Non-Slip Slippers, Bathroom Slippers, Home Slippers, Hotel Slippers, Adult Slippers/Men'S And Women'S Flip-Flops, Outdoor Sandals</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100596</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Flat Sandals & Flip Flops - Health Slippers</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Health Slippers, Massage Slippers</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100595</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Wedges</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Wedge Heels</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100560</span></div>
-    </div><div class="actions"></div></div>
-
-<div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Heels</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Low Heels, High Heels, Mid Heels</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100559</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Boots - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">None</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100587</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Boots - Rain Boots</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Rain Boots</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100585</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Boots - Fashion Boots</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Boots, Fashion Boots, Snow Boots, Winter Boots, Winter Shoes, Winter Footwear, Ugg</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100586</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Shoe Care & Accessories - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Rain Boot Covers, Shoe Buckles, Shoe Hole Repair Patches, Shoelace Fasteners</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100603</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Shoe Care & Accessories - Shoe Care & Cleaning Tools</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shoe Care, Shoe Maintenance, Shoe Materials And Supplies, Whitening, Shoe Polish, Shoe Shine, Shoe Brushing, Wet Wipes/Alcohol Wipes</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100601</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Shoe Care & Accessories - Shoe Horns & Trees</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shoehorn, Shoe Last, Shoe Support</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100600</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Shoe Care & Accessories - Shoe Laces</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shoelace</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100602</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Shoe Care & Accessories - Insoles & Heel Liners</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Heel Pads, Heel Anti-Friction, Heel Protection, Insoles</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100599</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Women Shoes - Shoe Care & Accessories - Shoe Deodorizers</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shoe Deodorizer, Deodorizing Spray, Deodorant</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100598</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Motorcycle Handlebar Covers, Lumbar Traction Device, Stretching Board</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">100729</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sports And Outdoor Wristbands, Mobile Phone Armbands, Athletic Socks, Sports Backpack, Sports Waist Pack</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101329</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Dry Bags</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Waterproof Bags, Waterproof Pouches, Waterproof Storage Bags, Rain Boot Covers, Rain Cover</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101323</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Rain Coats</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Raincoats, Rain Ponchos, Motorcycle Raincoat/Outdoor Raincoat</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101324</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Umbrellas</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Umbrellas, Rain Umbrellas, Parasols, Children'S Umbrellas, Oil-Paper Umbrellas, Outdoor Umbrellas With A Single Umbrella Pole, Beach Umbrellas, Sun Umbrellas, Patio Umbrellas, Umbrella Covers</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101325</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Gym Protective Gears</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sports Protective Gear, Sports Knee Braces, Fitness Belts, Resistance Bands, Weight Training Wrist Braces, Sports Protection, Impact-Resistant Knee Braces, Sports Finger Cots, Sports Bandages, Sports Protective Bandages</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101328</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Training Equipments</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Disc Cone, Soccer Cone, Agility Circle, Hula Hoop</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101327</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Sports & Outdoor Hats</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Hats, Outdoor Hats, Running Hats, Sports Hats</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101322</span></div>
-    </div><div class="actions"></div></div>
-
-<div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Sports Headbands</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Headbands, Sports Headbands, Running Headbands, Hairbands, Arm Sleeves, Athletic Socks, Sports Towel</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101321</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Sports Wristbands</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Wristbands, Wrist Supports, Sports Wristbands, Sports Bandages, Sports Protective Bandages, Athletic Socks, Sports Towel</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101320</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Stopwatches & Pedometers</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Stopwatch, Timer</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101318</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Shoe Bags</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Shoelaces, Shoe Bags, Sports Backpack, Sports Waist Pack</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101319</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Accessories - Mouthguards & Sport Tapes</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Dental Protectors, Mouthguards, Sports Bandages, Sports Protective Bandages</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101326</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Kid's Sports Apparel</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sportswear, Children'S Sportswear</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101316</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Arm Sleeves, Bibs, Hiking Covers, Riding Covers, Riding Sleeves, Sports Arm Sleeves, Athletic Socks</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101317</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Swimming Attire - One-Piece Swimsuits</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">One-Piece Swimsuit</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101899</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Swimming Attire - Bikini Sets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Bikini</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101898</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Swimming Attire - Rash Guards</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Wetsuit, Two-Piece Swimsuit (Top Is A Rash Guard, Bottom Is A Skirt Or Trunk)</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101900</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Swimming Attire - Others</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Non-Bikini Swimsuit Sets (Two-Piece), Swim Skirts, And Two-Piece Swimsuits (Top Is A Rash Guard Style, Bottom Is A Swim Skirt Or Swim Trunks).</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101901</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Swimming Attire - Swimming Trunks</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Swim Trunks, Boxer Shorts</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101897</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Jerseys</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Jerseys, Basketball Jerseys, Soccer Jerseys</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101312</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - T-shirts</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sports T-Shirts, T-Shirts, Sports top</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101311</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Bottoms</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Leggings, Sweatpants, Athletic Shorts, Sports bottoms</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101313</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Sports Bras</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sports Bra</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101315</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Jackets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sports Windbreaker, Sports Jacket</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101310</span></div>
-    </div><div class="actions"></div></div>
-
-    <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">BE - Sports & Outdoors - Sports & Outdoor Apparels - Sets</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">Sportswear Sets, Soccer Jerseys, Martial Arts Uniforms, Yoga Sets, Dance Costume Sets, Ski Suits, Yoga Wear</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value"></span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">101309</span></div>
-    </div><div class="actions"></div></div>
-
-
-
-</div>
-</div>
-
-<!-- PRODUCT CATEGORY COMPILATION -->
-<div class="card">
-    <div class="section-title" onclick="toggleSection(this)" style="cursor:pointer;">
-    PRODUCT CATEGORY COMPILATION  <span class="arrow">▶</span>
-</div>
-
-
-<div class="section-content">
-   <div class="link-item"><div class="link-left">
-        <div class="link-row"><span class="label highlight">Category Name (English):</span><span class="value">No Data</span></div>
-        <div class="link-row"><span class="label highlight">English kw:</span><span class="value">No Data</span></div>
-        <div class="link-row"><span class="label highlight">Reminder:</span><span class="value">No Data</span></div>
-        <div class="link-row"><span class="label">Leaf Node Category ID:</span><span class="value">No Data</span></div>
-    </div><div class="actions"></div></div>
-
-</div>
-</div>
-
-
-
+<!-- POPUP -->
+<div id="toast" class="toast"></div>
 
 <script>
-function copyLink(url){
-navigator.clipboard.writeText(url);
-const t=document.getElementById("toast");
-t.style.display="block";
-setTimeout(()=>t.style.display="none",2000);
+const fileInput = document.getElementById("fileInput");
+const output = document.getElementById("output");
+const toast = document.getElementById("toast");
+
+/* 🔥 TOAST FUNCTION */
+function showToast(message, type) {
+    toast.innerText = message;
+    toast.className = "toast " + type;
+    toast.style.display = "block";
+
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 2000);
 }
 
-function toggleMode(){
-document.documentElement.classList.toggle("dark");
-}
+/* 🔥 FILE HANDLER */
+fileInput.addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
+    const validNames = ["ck.xlsx", "pcc.xlsx"];
 
-</script>
+    if (!validNames.includes(file.name)) {
+        showToast("Invalid File!", "error");
+        output.innerHTML = "";
+        return;
+    }
 
-<script>
-document.querySelectorAll(".link-item").forEach(item => {
-    item.addEventListener("click", function(e) {
+    const reader = new FileReader();
 
-        // 🚫 Ignore clicks on Copy / Open
-        if (e.target.closest(".actions")) return;
+    reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
 
-        const ripple = document.createElement("span");
-        ripple.classList.add("ripple");
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
 
-        const rect = this.getBoundingClientRect();
+        renderData(json);
+        showToast("File successfully extracted!", "success");
+    };
 
-        const size = Math.max(rect.width, rect.height);
-        ripple.style.width = ripple.style.height = size + "px";
-
-        ripple.style.left = (e.clientX - rect.left - size / 2) + "px";
-        ripple.style.top = (e.clientY - rect.top - size / 2) + "px";
-
-        this.appendChild(ripple);
-
-        setTimeout(() => ripple.remove(), 600);
-    });
+    reader.readAsArrayBuffer(file);
 });
-</script>
 
 
-<script>
+
 const searchBox = document.getElementById("searchBox");
 const resultsBox = document.getElementById("searchResults");
 
-resultsBox.addEventListener("click", function(e) {
+let globalData = []; // store uploaded data
+
+/* 🔥 MODIFY YOUR renderData */
+function renderData(rows) {
+    output.innerHTML = "";
+    globalData = rows; // store for search
+
+    rows.forEach(row => {
+        const card = document.createElement("div");
+        card.className = "data-card";
+
+        card.dataset.fulltext = (
+            (row["LNC ID"] || "") + " " +
+            (row["Category Name (English)"] || "") + " " +
+            (row["English Keyword"] || "") + " " +
+            (row["Reminder"] || "")
+        ).toLowerCase();
+
+const originalHTML = `
+    <div><b>LNCID:</b> ${row["LNC ID"] || ""}</div>
+    <div><b>Category Name (English):</b> ${row["Category Name (English)"] || ""}</div>
+    <div><b>English Keyword:</b> ${row["English Keyword"] || ""}</div>
+    <div><b>Reminder:</b> ${row["Reminder"] || ""}</div>
+`;
+
+card.dataset.original = originalHTML;   // 🔥 REQUIRED
+card.innerHTML = originalHTML;
+
+        output.appendChild(card);
+    });
+}
+
+searchBox.addEventListener("input", function () {
+    const query = this.value.toLowerCase().trim();
+
+    if (query.length < 3) {
+        resultsBox.style.display = "none";
+        resetCards();
+        return;
+    }
+
+    const filtered = globalData.filter(row =>
+        (row["LNC ID"] || "").toLowerCase().includes(query) ||
+        (row["Category Name (English)"] || "").toLowerCase().includes(query) ||
+        (row["English Keyword"] || "").toLowerCase().includes(query) ||
+        (row["Reminder"] || "").toLowerCase().includes(query)
+    );
+
+    renderDropdown(filtered);
+    filterCards(query);
+    highlightMatches(query);
+});
+
+function renderDropdown(data) {
+    if (data.length === 0) {
+        resultsBox.style.display = "none";
+        return;
+    }
+
+    resultsBox.innerHTML = data.map(row => `
+        <div class="result-item" data-id="${row["LNC ID"]}">
+            <div class="result-id">LNCID: ${row["LNC ID"]}</div>
+            <div class="result-category">
+                Category Name (English): ${row["Category Name (English)"]}
+            </div>
+        </div>
+    `).join("");
+
+    resultsBox.style.display = "block";
+}
+
+resultsBox.addEventListener("click", function (e) {
     const item = e.target.closest(".result-item");
     if (!item) return;
 
     const id = item.dataset.id;
 
-    scrollToElementById(id);
+    const target = [...document.querySelectorAll(".data-card")]
+        .find(card => card.innerText.includes(id));
+
+if (!target) return;
+
+document.querySelectorAll(".data-card").forEach(card => {
+    card.classList.remove("active-highlight");
 });
 
-let currentIndex = -1;
-let currentResults = [];
+// 🔥 remove highlight (important)
+document.querySelectorAll(".data-card").forEach(card => {
+    card.innerHTML = card.dataset.original;
+});
 
+target.scrollIntoView({ behavior: "smooth", block: "center" });
 
-// 🔥 render dropdown
-function renderResults(filtered) {
-    currentResults = filtered;
+setTimeout(() => {
+    let count = 0;
 
-    if (filtered.length === 0) {
-        resultsBox.style.display = "block";
-        resultsBox.innerHTML = `<div style="padding:10px;">No results found</div>`;
-        return;
+    function pulse() {
+        if (count >= 6) return;
+
+        target.classList.remove("active-highlight");
+        void target.offsetWidth;
+        target.classList.add("active-highlight");
+
+        count++;
+        setTimeout(pulse, 500);
     }
 
-    resultsBox.innerHTML = filtered.map((link, index) => `
-    <div class="result-item" 
-         data-id="${link.leafId}"
-         data-index="${index}"
-         style="padding:10px;cursor:pointer;border-bottom:1px solid #eee;">
-
-        <div style="font-weight:600;">
-            ID: ${link.leafId}
-        </div>
-
-        <div style="font-size:12px;color:#555;">
-            ${link.category}
-        </div>
-
-    </div>
-`).join("");
-
-    currentIndex = 0;
-
-    const items = document.querySelectorAll(".result-item");
-    items[0]?.classList.add("active");
-
-    resultsBox.style.display = "block";
-}
-
-function scrollToElementById(id) {
-    const items = document.querySelectorAll(".link-item");
-
-    let target = null;
-
-    items.forEach(item => {
-        const values = item.querySelectorAll(".value");
-        const leafId = values[3]?.innerText;
-
-        if (leafId === id) {
-            target = item;
-        }
-    });
-
-    if (!target) return;
-
-    // 🔥 STEP 1: open section
-    const section = target.closest(".section-content");
-    const title = section.previousElementSibling;
-
-    section.style.maxHeight = section.scrollHeight + "px";
-    title.classList.add("active");
-
-    // 🔥 STEP 2: wait for layout (CRITICAL FIX)
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-
-            // 🔥 STEP 3: perfect center scroll
-            const rect = target.getBoundingClientRect();
-            const absoluteTop = rect.top + window.pageYOffset;
-            const offset = window.innerHeight / 2 - rect.height / 2;
-
-            window.scrollTo({
-                top: absoluteTop - offset,
-                behavior: "smooth"
-            });
-
-            // 🔥 STEP 4: animation AFTER scroll
-            setTimeout(() => {
-                let count = 0;
-
-                function popRepeat() {
-                    if (count >= 3) return;
-
-                    target.classList.remove("pop-highlight");
-                    void target.offsetWidth;
-                    target.classList.add("pop-highlight");
-
-                    count++;
-                    setTimeout(popRepeat, 600);
-                }
-
-                popRepeat();
-
-            }, 500); // adjust if needed
-
-        });
-    });
-
-    // cleanup
+    pulse();
+}, 300);
     resultsBox.style.display = "none";
     searchBox.blur();
-}
+});
 
-
-// 🔥 input handler
-
-function getAllLinks() {
-    const items = document.querySelectorAll(".link-item");
-
-    return Array.from(items).map(item => {
-        const values = item.querySelectorAll(".value");
-
-        return {
-            element: item,
-            category: values[0]?.innerText || "",
-            keywords: values[1]?.innerText || "",
-            leafId: values[3]?.innerText || "",
-            fullText: item.textContent.toLowerCase()
-        };
+function filterCards(query) {
+    document.querySelectorAll(".data-card").forEach(card => {
+        if (card.dataset.fulltext.includes(query)) {
+            card.style.display = "block";   // show
+        } else {
+            card.style.display = "none";    // remove from layout
+        }
     });
 }
 
-searchBox.addEventListener("input", function() {
-    const query = this.value.toLowerCase().trim();
-
-    if (query.length < 3) {
-        resultsBox.style.display = "none";
-        resultsBox.innerHTML = "";
-        resetMainList();
-
-
-        document.querySelectorAll(".section-title").forEach(title => {
-            title.classList.remove("active");
-        });
-
-        return;
-    }
-
-    const allLinks = getAllLinks();
-
-    const filtered = allLinks.filter(link =>
-        link.fullText.includes(query)
-    );
-
-    // 🔥 DEBUG (optional, remove later)
-    console.log("Filtered:", filtered);
-
-    highlightMainList(query);
-    renderResults(filtered);
-});
-
-// 🔥 keyboard navigation
-searchBox.addEventListener("keydown", function(e) {
-    const items = document.querySelectorAll(".result-item");
-
-    if (!items.length) return;
-
-    if (e.key === "ArrowDown") {
-        e.preventDefault();
-        currentIndex = (currentIndex + 1) % items.length;
-    }
-
-    if (e.key === "ArrowUp") {
-        e.preventDefault();
-        currentIndex = (currentIndex - 1 + items.length) % items.length;
-    }
-
-if (e.key === "Enter") {
-    e.preventDefault();
-
-    const query = searchBox.value.toLowerCase().trim();
-
-    if (query.length < 3) return;
-
-    const allLinks = getAllLinks();
-    const filtered = allLinks.filter(link =>
-        link.fullText.includes(query)
-    );
-
-    if (filtered.length === 0) return;
-
-    // 🔥 ALWAYS sync state here
-    currentResults = filtered;
-
-    // 🔥 If dropdown hidden → show it
-    if (resultsBox.style.display === "none") {
-        renderResults(filtered);
-        return;
-    }
-
-    // 🔥 Guarantee valid index
-    if (currentIndex < 0 || currentIndex >= filtered.length) {
-        currentIndex = 0;
-    }
-
-    // 🔥 Execute
-    scrollToItem(currentIndex);
+function resetCards() {
+    document.querySelectorAll(".data-card").forEach(card => {
+        card.style.display = "block";
+        card.innerHTML = card.dataset.original; // 🔥 remove highlight
+    });
 }
 
-    if (e.key === "Escape") {
-        resultsBox.style.display = "none";
-        return;
-    }
-
-    // 🔥 highlight active
-    items.forEach(item => item.classList.remove("active"));
-    if (items[currentIndex]) {
-        items[currentIndex].classList.add("active");
-    }
-});
-
-// 🔥 click outside
-document.addEventListener("click", function(e) {
-    if (!e.target.closest("#searchBox") && !e.target.closest("#searchResults")) {
+document.addEventListener("click", function (e) {
+    if (!e.target.closest(".search-wrapper")) {
         resultsBox.style.display = "none";
     }
 });
-</script>
 
-<script>
-function openLink(title, url) {
-    saveRecent(title, url);
-    window.open(url, "_blank");
-}
-
-function saveRecent(title, url) {
-    let recents = JSON.parse(localStorage.getItem("recentLinks")) || [];
-
-    // remove duplicate
-    recents = recents.filter(item => item.url !== url);
-
-    // add to top
-    recents.unshift({ title, url });
-
-    // limit to 5 items
-    recents = recents.slice(0, 5);
-
-    localStorage.setItem("recentLinks", JSON.stringify(recents));
-}
-</script>
-
-<script>
-
-searchBox.addEventListener("focus", function() {
-    const query = this.value.toLowerCase().trim();
-
-    if (query.length < 3) return;
-
-    const allLinks = getAllLinks();
-
-    const filtered = allLinks.filter(link =>
-        link.fullText.includes(query)
-    );
-
-    renderResults(filtered); // 🔥 show dropdown again
-});</script>
-
-<script>
-function clearRecent() {
-    const toast = document.getElementById("toast");
-
-    if (confirm("Clear recent searches?")) {
-        localStorage.removeItem("recentLinks");
-
-        // update dropdown
-        const resultsBox = document.getElementById("searchResults");
-        resultsBox.innerHTML = `<div style="padding:10px;">No recent items</div>`;
-
-        // ✅ success message
-        toast.innerText = "Recent searches cleared!";
-        toast.style.background = "#28a745"; // green
-    } else {
-        // ❌ cancel message
-        toast.innerText = "No changes made.";
-        toast.style.background = "#ffca2c"; // yellow
-        toast.style.color = "#000"; // 🔥 important for readability
+searchBox.addEventListener("focus", function () {
+    if (this.value.length >= 3) {
+        resultsBox.style.display = "block";
     }
+});
 
-    // show toast
-    toast.style.display = "block";
-    setTimeout(() => {
-        toast.style.display = "none";
-    }, 700);
-}
-</script>
+function highlightMatches(query) {
+    const regex = new RegExp(`(${query})`, "gi");
 
-<script>
-function toggleSection(el) {
-    const content = el.nextElementSibling;
+    document.querySelectorAll(".data-card").forEach(card => {
+        // restore original first
+        card.innerHTML = card.dataset.original;
 
-    if (content.style.maxHeight && content.style.maxHeight !== "0px") {
-        content.style.maxHeight = "0";
-        el.classList.remove("active"); // 🔥 rotate back
-    } else {
-        content.style.maxHeight = content.scrollHeight + "px";
-        el.classList.add("active"); // 🔥 rotate arrow
+        if (query.length < 3) return;
+
+        card.querySelectorAll("div").forEach(div => {
+    const labelEnd = div.innerHTML.indexOf("</b>");
+    if (labelEnd !== -1) {
+        const label = div.innerHTML.substring(0, labelEnd + 4);
+        const value = div.innerHTML.substring(labelEnd + 4);
+
+        const highlightedValue = value.replace(regex, `<mark>$1</mark>`);
+        div.innerHTML = label + highlightedValue;
     }
-}
-</script>
-
-<script>
-let allExpanded = false;
-
-function toggleAllSections() {
-    const sections = document.querySelectorAll(".section-content");
-    const titles = document.querySelectorAll(".section-title");
-
-    sections.forEach(section => {
-        if (!allExpanded) {
-            section.style.maxHeight = section.scrollHeight + "px";
-        } else {
-            section.style.maxHeight = "0";
-        }
-    });
-
-    titles.forEach(title => {
-        if (!allExpanded) {
-            title.classList.add("active");   // rotate arrow
-        } else {
-            title.classList.remove("active"); // reset arrow
-        }
-    });
-
-    allExpanded = !allExpanded;
-
-    // toggle button icon
-    const btn = document.querySelector('[onclick="toggleAllSections()"]');
-    btn.textContent = allExpanded ? "⬆️" : "⬇️";
-}
-</script>
-
-<script>
-function updateSectionsBySearch(filtered) {
-    const allSections = document.querySelectorAll(".section-content");
-
-    allSections.forEach(section => {
-        const items = section.querySelectorAll(".link-item");
-        let hasMatch = false;
-
-        items.forEach(item => {
-            
-
-            if (filtered.some(f => f.title.toLowerCase() === title)) {
-                hasMatch = true;
-            }
-        });
-
-        const titleEl = section.previousElementSibling;
-
-        if (hasMatch) {
-            section.style.maxHeight = section.scrollHeight + "px";
-            titleEl.classList.add("active"); // rotate arrow
-        } else {
-            section.style.maxHeight = "0";
-            titleEl.classList.remove("active");
-        }
-    });
-}
-</script>
-
-<script>
-function highlightMainList(query) {
-    document.querySelectorAll(".link-item").forEach(item => {
-
-        const rows = item.querySelectorAll(".value");
-
-        rows.forEach(el => {
-            const original = el.dataset.original || el.innerText;
-
-            if (!el.dataset.original) {
-                el.dataset.original = original;
-            }
-
-            const regex = new RegExp(`(${query})`, "gi");
-            el.innerHTML = original.replace(regex, `<mark>$1</mark>`);
-        });
-
+});
     });
 }
 
-function resetMainList() {
-    document.querySelectorAll(".value").forEach(el => {
-        if (el.dataset.original) {
-            el.innerText = el.dataset.original;
-        }
-    });
-}
 
 </script>
-
-
 
 </body>
-
 </html>
-
