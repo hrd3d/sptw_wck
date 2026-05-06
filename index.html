@@ -199,9 +199,7 @@ mark {
 
 <!-- CLICKABLE LOGO -->
 <div class="logo-container">
-    <img src="logo2.png"
-     style="cursor:pointer;"
-     onclick="document.getElementById('fileInput').click()">
+<img src="logo2.png" style="cursor:default;">
 
     <div class="search-wrapper">
         <input type="text" id="searchBox" placeholder="Search...">
@@ -209,8 +207,6 @@ mark {
     </div>
 </div>
 
-<!-- HIDDEN FILE INPUT -->
-<input type="file" id="fileInput" accept=".xlsx" style="display:none">
 
 <!-- DATA OUTPUT -->
 <div class="container" id="output"></div>
@@ -218,8 +214,9 @@ mark {
 <!-- POPUP -->
 <div id="toast" class="toast"></div>
 
+<script src="ck.js"></script>
+
 <script>
-const fileInput = document.getElementById("fileInput");
 const output = document.getElementById("output");
 const toast = document.getElementById("toast");
 
@@ -233,36 +230,6 @@ function showToast(message, type) {
         toast.style.display = "none";
     }, 2000);
 }
-
-/* 🔥 FILE HANDLER */
-fileInput.addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const validNames = ["ck.xlsx", "pcc.xlsx"];
-
-    if (!validNames.includes(file.name)) {
-        showToast("Invalid File!", "error");
-        output.innerHTML = "";
-        return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet);
-
-        renderData(json);
-        showToast("File successfully extracted!", "success");
-    };
-
-    reader.readAsArrayBuffer(file);
-});
-
 
 
 const searchBox = document.getElementById("searchBox");
@@ -432,6 +399,10 @@ function highlightMatches(query) {
     });
 }
 
+/* 🔥 AUTO LOAD DATA */
+renderData(ckData);
+
+showToast("Data loaded successfully!", "success");
 
 </script>
 
